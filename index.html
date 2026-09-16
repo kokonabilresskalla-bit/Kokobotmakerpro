@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>السيسي خوووود - النسخة المطورة</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- شاشة البداية الرئيسية -->
+    <div id="main-menu" class="screen active">
+        <h1 class="game-title">السيسي خوووود</h1>
+        <div class="stats-bar">
+            <span>🪙 <span id="menu-coins">0</span></span>
+            <span>🏆 أعلى نقاط: <span id="menu-high-score">0</span></span>
+        </div>
+        <div class="menu-buttons">
+            <button class="btn primary" onclick="Game.showScreen('level-select-screen')">العب الآن</button>
+            <button class="btn secondary" onclick="Game.showScreen('map-screen')">خريطة المراحل</button>
+            <button class="btn secondary" onclick="Game.showScreen('characters-screen')">الشخصيات والـ Skins</button>
+            <button class="btn secondary" onclick="Game.showScreen('shop-screen')">المتجر</button>
+            <button class="btn secondary" onclick="Game.showScreen('settings-screen')">الإعدادات</button>
+        </div>
+    </div>
+
+    <!-- شاشة خريطة المراحل -->
+    <div id="map-screen" class="screen">
+        <h2>خريطة المراحل</h2>
+        <div id="levels-grid" class="levels-grid"></div>
+        <button class="btn back" onclick="Game.showScreen('main-menu')">الرجوع للقائمة</button>
+    </div>
+
+    <!-- شاشة اختيار المراحل البسيطة -->
+    <div id="level-select-screen" class="screen">
+        <h2>اختر المرحلة</h2>
+        <div class="quick-levels">
+            <button class="btn primary" onclick="Game.startLevel(1)">المرحلة الأولى</button>
+            <button class="btn secondary" onclick="Game.showScreen('map-screen')">عرض الـ 50 مرحلة</button>
+        </div>
+        <button class="btn back" onclick="Game.showScreen('main-menu')">رجوع</button>
+    </div>
+
+    <!-- شاشة الشخصيات -->
+    <div id="characters-screen" class="screen">
+        <h2>اختر الشخصية</h2>
+        <div id="characters-grid" class="cards-grid"></div>
+        <button class="btn back" onclick="Game.showScreen('main-menu')">رجوع</button>
+    </div>
+
+    <!-- شاشة المتجر -->
+    <div id="shop-screen" class="screen">
+        <h2>متجر الـ Skins</h2>
+        <div class="stats-bar"><span>🪙 رصيدك: <span id="shop-coins">0</span></span></div>
+        <div id="shop-grid" class="cards-grid"></div>
+        <button class="btn back" onclick="Game.showScreen('main-menu')">رجوع</button>
+    </div>
+
+    <!-- شاشة الإعدادات -->
+    <div id="settings-screen" class="screen">
+        <h2>الإعدادات</h2>
+        <div class="settings-options">
+            <label><input type="checkbox" id="setting-music" checked onchange="Game.toggleMusic()"> تشغيل الموسيقى</label>
+            <label><input type="checkbox" id="setting-sfx" checked onchange="Game.toggleSfx()"> المؤثرات الصوتية</label>
+            <label><input type="checkbox" id="setting-vibrate" checked onchange="Game.toggleVibrate()"> الاهتزاز</label>
+            <button class="btn danger" onclick="Game.resetProgress()">إعادة ضبط التقدم</button>
+        </div>
+        <button class="btn back" onclick="Game.showScreen('main-menu')">رجوع</button>
+    </div>
+
+    <!-- واجهة اللعب الرئيسية -->
+    <div id="game-screen" class="screen">
+        <div class="game-hud">
+            <div>المرحلة: <span id="hud-level">1</span></div>
+            <div>🪙 <span id="hud-coins">0</span></div>
+            <div>⭐ <span id="hud-score">0</span></div>
+            <button class="pause-btn" onclick="Game.pauseGame()">⏸️</button>
+        </div>
+        <div id="powerup-hud" class="powerup-hud"></div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="mobile-controls">
+            <button class="control-btn" ontouchstart="Game.moveLeft()" onmousedown="Game.moveLeft()">⬅️</button>
+            <button class="control-btn" ontouchstart="Game.jump()" onmousedown="Game.jump()">⬆️ خوووود</button>
+            <button class="control-btn" ontouchstart="Game.moveRight()" onmousedown="Game.moveRight()">➡️</button>
+        </div>
+    </div>
+
+    <!-- شاشة نهاية المرحلة (Level Complete) -->
+    <div id="complete-screen" class="screen modal">
+        <div class="modal-content">
+            <h2>🎉 كفو! أنهيت المرحلة</h2>
+            <div id="complete-stars">⭐⭐⭐</div>
+            <p>النقاط: <span id="complete-score">0</span></p>
+            <p>العملات المجمعة: <span id="complete-coins">0</span></p>
+            <button class="btn primary" onclick="Game.nextLevel()">المرحلة التالية</button>
+            <button class="btn secondary" onclick="Game.restartLevel()">إعادة المحاولة</button>
+            <button class="btn back" onclick="Game.showScreen('map-screen')">خريطة المراحل</button>
+        </div>
+    </div>
+
+    <!-- شاشة الخسارة (Game Over) -->
+    <div id="gameover-screen" class="screen modal">
+        <div class="modal-content">
+            <h2>💥 خوووود خسارة!</h2>
+            <p id="gameover-reason">اصطدمت بالعقبة</p>
+            <p>النقاط: <span id="gameover-score">0</span></p>
+            <button class="btn primary" onclick="Game.restartLevel()">إعادة المحاولة</button>
+            <button class="btn back" onclick="Game.showScreen('map-screen')">خريطة المراحل</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
